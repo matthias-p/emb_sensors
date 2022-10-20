@@ -27,9 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.example.sensors.ui.theme.SensorsTheme
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : ComponentActivity() {
@@ -43,6 +46,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun SensorData(modifier: Modifier = Modifier) {
     val sensorManager = LocalContext.current.getSystemService(SENSOR_SERVICE) as SensorManager
@@ -101,19 +105,14 @@ fun SensorData(modifier: Modifier = Modifier) {
 fun MyList(itemList: List<String>, modifier: Modifier = Modifier) {
     val listState = rememberLazyListState()
     val composableScope = rememberCoroutineScope()
-    val itemListSize = remember {
-        mutableStateOf(itemList.size)
-    }
-    println(itemListSize)
-    println(itemList.size)
 
     LazyColumn (state = listState) {
         items(itemList) {
             item -> Text(text = item)
         }
-    }
-    composableScope.launch {
-        listState.animateScrollToItem(itemList.size)
+        composableScope.launch {
+            listState.animateScrollToItem(itemList.size)
+        }
     }
 }
 
